@@ -174,8 +174,6 @@ thread_create (const char *name, int priority,
 
   ASSERT (function != NULL);
 
-  t->ticks_blocked = 0;
-
   /* Allocate thread. */
   t = palloc_get_page (PAL_ZERO);
   if (t == NULL)
@@ -199,6 +197,8 @@ thread_create (const char *name, int priority,
   sf = alloc_frame (t, sizeof *sf);
   sf->eip = switch_entry;
   sf->ebp = 0;
+
+  t->ticks_blocked = 0;
 
   /* Add to run queue. */
   thread_unblock (t);
