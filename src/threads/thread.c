@@ -174,6 +174,8 @@ thread_create (const char *name, int priority,
 
   ASSERT (function != NULL);
 
+  t->ticks_blocked = 0;
+
   /* Allocate thread. */
   t = palloc_get_page (PAL_ZERO);
   if (t == NULL)
@@ -582,3 +584,19 @@ allocate_tid (void)
 /* Offset of `stack' member within `struct thread'.
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
+
+/* Check the blocked thread */
+void
+blocked_thread_check (struct thread *t, void *aux UNUSED)
+{
+  if (t->status == THREAD_BLOCKED && t->ticks_blocked > 0)
+  {
+    t->ticks_blocked--;
+    if (t->ticks_blocked == 0)
+    {
+      thread_unblock (t);
+    }
+    
+  }
+  
+}
